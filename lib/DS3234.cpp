@@ -27,5 +27,12 @@ void DS3234::SetMonth(int month)
 {
     uint8_t tMonth = month / 10;
     uint8_t month = month % 10;
-    WriteDataBySPI(0x85,(tMonth << 4) + month); //I don't know what is "Century"bit in datasheet of ds3234
+    WriteDataBySPI(0x85, (tMonth << 4) + month); //I don't know what is "Century"bit in datasheet of ds3234
+}
+
+void DS3234::SetDay(int day)
+{
+    uint8_t tDay = day / 10;
+    uint8_t day = day % 10;
+    WriteDataBySPI(0x84, (tDay << 4) + day);
 }
