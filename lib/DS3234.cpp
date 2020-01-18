@@ -60,6 +60,7 @@ int DS3234::SetDateTime(int year, int month, int day, int hour, int min, int sec
 
 uint8_t DS3234::GetTime(TimeType type)
 {
+<<<<<<< HEAD
     uint8_t result = ReadDataBySPI(type);
     if (type == HOUR)
     {
@@ -71,3 +72,16 @@ uint8_t DS3234::GetTime(TimeType type)
         return bitRead(result, 4) * 10 + (result & 0x0f);
     return (result >> 4) * 10 + (result & 0x0f);
 }
+=======
+    uint8_t tMonth = month / 10;
+    uint8_t month = month % 10;
+    WriteDataBySPI(0x85, (tMonth << 4) + month); //I don't know what is "Century"bit in datasheet of ds3234
+}
+
+void DS3234::SetDay(int day)
+{
+    uint8_t tDay = day / 10;
+    uint8_t day = day % 10;
+    WriteDataBySPI(0x84, (tDay << 4) + day);
+}
+>>>>>>> 705590f5b9132ff4c8f1e1f2eea075918d077168
