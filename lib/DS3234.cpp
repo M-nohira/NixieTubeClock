@@ -75,6 +75,7 @@ uint8_t DS3234::GetTime(TimeType type)
 =======
     uint8_t tMonth = month / 10;
     uint8_t month = month % 10;
+<<<<<<< HEAD
     WriteDataBySPI(0x85, (tMonth << 4) + month); //I don't know what is "Century"bit in datasheet of ds3234
 }
 
@@ -85,3 +86,7 @@ void DS3234::SetDay(int day)
     WriteDataBySPI(0x84, (tDay << 4) + day);
 }
 >>>>>>> 705590f5b9132ff4c8f1e1f2eea075918d077168
+=======
+    WriteDataBySPI(0x85,(tMonth << 4) + month); //I don't know what is "Century"bit in datasheet of ds3234
+}
+>>>>>>> parent of 705590f... update RTC library
