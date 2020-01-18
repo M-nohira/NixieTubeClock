@@ -28,8 +28,6 @@ void Nixie::ShowDisplay()
     }
 }
 
-uint8_t DS3234::ReadDataBySPI(uint8_t address)
-=======
 void Nixie::ShowDisplay()
 {
     for (int cnt = 0; cnt <= 6; cnt++)
