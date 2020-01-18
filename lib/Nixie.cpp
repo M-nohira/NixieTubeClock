@@ -17,12 +17,12 @@ void Nixie::ShowDisplay()
 {
     for (int cnt = 0; cnt <= 6; cnt++)
     {
-        //num setting
+        // num setting
         int code = GetShiftCode(schematic[cnt]);
         shiftOut(NUM_SER, NUM_SCLK, MSBFIRST, (code >> 8));
         shiftOut(NUM_SER, NUM_SCLK, MSBFIRST, code);
         ActivateRegister(NUM_RCLK);
-        //index setting
+        // index setting
         shiftOut(DISPLAY_SER, DISPLAY_SCLK, MSBFIRST, indexCode[cnt]);
         ActivateRegister(DISPLAY_RCLK);
     }
