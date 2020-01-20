@@ -2,7 +2,7 @@
 
 DS3234::DS3234()
 {
-    DS3234Setting = SPISettings(8000000, MSBFIRST, SPI_MODE1);
+    DS3234Setting = SPISettings(4000000, MSBFIRST, SPI_MODE1);
     SPI.begin();
 }
 

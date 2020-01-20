@@ -13,14 +13,13 @@
 #define MODE_DISPLAY 0
 
 //fLASHING SETTINGS
-#define FLASHING_PERIOD 250 //milli seconds
+#define RTC_READ_PERIOD 500 //milli seconds
 
 #define KEY_FLAG_STATE 0 // 0=pressed 1=pressing
 
 DS3234 rtc;
 Nixie nixie;
 unsigned long elaped_time = 0;
-unsigned long current_time = 0;
 
 int time[7] = {0, 0, 0, 0, 0, 0};
 int _mode = 0;
@@ -122,8 +121,11 @@ void loop()
 
     ResetFlag();
     //Serial.println("Read Current Time");
-
-    ReadCurrentTime();
+    if (elaped_time + RTC_READ_PERIOD <= millis())
+    {
+        ReadCurrentTime();
+        elaped_time = millis();
+    }
     SetNixieSchematicByTime();
 }
 
