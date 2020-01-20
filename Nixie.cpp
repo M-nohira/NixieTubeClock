@@ -3,52 +3,57 @@
 Nixie::Nixie()
 {
     //initialize pin 4-6 and 11-14
-    for (int cnt = 4; cnt <= 6; cnt++)
-        pinMode(OUTPUT, cnt);
-    for (int cnt = 11; cnt <= 14; cnt++)
-        pinMode(OUTPUT, cnt);
+    for (int cnt = 2; cnt <= 4; cnt++)
+    {
+        pinMode(cnt, OUTPUT);
+        digitalWrite(cnt, 0);
+    }
+    for (int cnt = 5; cnt <= 8; cnt++)
+    {
+        pinMode(cnt, OUTPUT);
+        digitalWrite(cnt, 0);
+    }
 
-    for (int cnt = 0; cnt <= 6; cnt++)
+    for (int cnt = 0; cnt <= 5; cnt++)
         for (int i = 0; i <= 1; i++)
             schematic[cnt][i] = 0;
+
+    digitalWrite(NUM_CLR, 1);
 }
 
 void Nixie::ShowDisplay()
 {
-    for (int cnt = 0; cnt <= 6; cnt++)
+    for (int cnt = 0; cnt <= 5; cnt++)
     {
+        // index setting
+        shiftOut(DISPLAY_SER, DISPLAY_SCLK, MSBFIRST, indexCode[cnt]);
         // num setting
         int code = GetShiftCode(schematic[cnt]);
         shiftOut(NUM_SER, NUM_SCLK, MSBFIRST, (code >> 8));
         shiftOut(NUM_SER, NUM_SCLK, MSBFIRST, code);
+        //Activate
         ActivateRegister(NUM_RCLK);
-        // index setting
-        shiftOut(DISPLAY_SER, DISPLAY_SCLK, MSBFIRST, indexCode[cnt]);
         ActivateRegister(DISPLAY_RCLK);
-    }
-}
 
-void Nixie::ShowDisplay()
-{
-    for (int cnt = 0; cnt <= 6; cnt++)
-    {
-        //num setting
-        int code = GetShiftCode(schematic[cnt]);
-        shiftOut(NUM_SER, NUM_SCLK, MSBFIRST, (code >> 8));
-        shiftOut(NUM_SER, NUM_SCLK, MSBFIRST, code);
-        ActivateRegister(NUM_RCLK);
-        //index setting
-        shiftOut(DISPLAY_SER, DISPLAY_SCLK, MSBFIRST, indexCode[cnt]);
+        // Serial.println(indexCode[cnt], 2);
+        // Serial.println(code, 2);
+
+        delayMicroseconds(ON_TIME);
+        //Avoid Ghost
+        shiftOut(DISPLAY_SER, DISPLAY_SCLK, MSBFIRST, 0x00);
         ActivateRegister(DISPLAY_RCLK);
+        delayMicroseconds(OFF_TIME);
     }
+    
 }
 
 void Nixie::ActivateRegister(int pin_register)
 {
-    digitalWrite(pin_register, 0);
+
     //delay(1);
     digitalWrite(pin_register, 1);
-    //delay(1);
+    delayMicroseconds(100);
+    digitalWrite(pin_register, 0);
 }
 
 int Nixie::GetShiftCode(int number[2])
@@ -63,13 +68,13 @@ int Nixie::JudgeDpCode(int code, int dpcode)
     switch (dpcode)
     {
     case 1:
-        code = (0b01 << 10) or code;
+        code = (0b01 << 10) + code;
         break;
     case 2:
-        code = (0b10 << 10) or code;
+        code = (0b10 << 10) + code;
         break;
     case 3:
-        code = (0b11 << 10) or code;
+        code = (0b11 << 10) + code;
         break;
     default:
         break;
