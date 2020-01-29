@@ -13,7 +13,7 @@
 #define MODE_DISPLAY 0
 
 //fLASHING SETTINGS
-#define RTC_READ_PERIOD 500 //milli seconds
+#define RTC_READ_PERIOD 100 //milli seconds
 
 #define KEY_FLAG_STATE 0 // 0=pressed 1=pressing
 
