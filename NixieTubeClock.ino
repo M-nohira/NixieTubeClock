@@ -29,6 +29,7 @@ void mode_SerialSetTime(uint8_t keyState);
 
 void ReadCurrentTime();
 void ApplyRTCTime();
+void SetUpTimeBySerial(String str);
 void SetNixieSchematicByTime(int *code, int *dpCode, bool none = false);
 void LimitDateValue(int parameter, int max, int min);
 
@@ -42,14 +43,11 @@ void loop()
     uint8_t keyState = boad.ReadKeyState();
     if (Serial.available() > 0)
     {
-        _mode = MODE_SERIAL;
+        //_mode = MODE_SERIAL;
     }
-    if (_mode == MODE_DISPLAY)
-        mode_Clock(keyState);
-    if (_mode == MODE_SETTING)
-        mode_SetTime(keyState);
-    if (_mode == MODE_SERIAL)
-        mode_SerialSetTime(keyState);
+    if(_mode == MODE_DISPLAY) mode_Clock(keyState);
+    if(_mode == MODE_SETTING) mode_SetTime(keyState);
+    if(_mode == MODE_SERIAL) mode_SerialSetTime(keyState);
     nixie.ShowDisplay();
 }
 
@@ -150,6 +148,17 @@ void ReadCurrentTime()
 void ApplyRTCTime()
 {
     rtc.SetDateTime(time[YEAR], time[MONTH], time[DAY], time[HOUR], time[MINUTE], time[SECOND]);
+}
+
+void SetNixieSchematicByTime(int *code, int *dpCode = 0, bool none = false)
+{
+    for (int cnt = 0; cnt < 3; cnt++)
+    {
+        nixie.schematic[2 * cnt][0] = none == false ? code[3 - cnt] / 10 : 10;
+        nixie.schematic[2 * cnt][1] = dpCode[2 * cnt];
+        nixie.schematic[2 * cnt + 1][0] = none == false ? code[3 - cnt] % 10 : 10;
+        nixie.schematic[2 * cnt + 1][1] = dpCode[2 * cnt + 1];
+    }
 }
 
 void LimitDateValue(int parameter, int max, int min)
