@@ -21,7 +21,7 @@ unsigned long elaped_time = 0;
 
 int time[7] = {0, 0, 0, 0, 0, 0};
 int _mode = 0;
-int setting_index = 6;
+int setting_index = 5;
 
 void mode_Clock(uint8_t keyState);
 void mode_SetTime(uint8_t keyState);
@@ -44,10 +44,14 @@ void loop()
     if (Serial.available() > 0)
     {
         _mode = MODE_SERIAL;
+        Serial.println("SERIAL MODE ENTER COMMAND");
     }
-    if(_mode == MODE_DISPLAY) mode_Clock(keyState);
-    if(_mode == MODE_SETTING) mode_SetTime(keyState);
-    if(_mode == MODE_SERIAL) mode_SerialSetTime(keyState);
+    if (_mode == MODE_DISPLAY)
+        mode_Clock(keyState);
+    if (_mode == MODE_SETTING)
+        mode_SetTime(keyState);
+    if (_mode == MODE_SERIAL)
+        mode_SerialSetTime(keyState);
     nixie.ShowDisplay();
 }
 
@@ -55,11 +59,13 @@ void mode_Clock(uint8_t keyState)
 {
     ReadCurrentTime();
 
-    int sw_bFlag = bitRead(keyState, 8);
-    _mode = MODE_SETTING;
+    int sw_bFlag = bitRead(keyState, 7);
+    if (sw_bFlag == 1)
+        _mode = MODE_SETTING;
 
-    int dp[6] = {0, 1, 0, 1, 0, 1};
-    SetNixieSchematicByTime(time, dp);
+    int dp[6] = {0, 2, 0, 2, 0, 2};
+    int tt[3] = {time[HOUR], time[MINUTE], time[SECOND]};
+    SetNixieSchematicByTime(tt, dp);
 }
 
 void mode_SetTime(uint8_t keyState)
@@ -73,9 +79,10 @@ void mode_SetTime(uint8_t keyState)
 
     if (bitRead(keyState, 6)) //Accept Flag
     {
-        if (setting_index == 1)
+        if (setting_index == 0)
         {
             ApplyRTCTime();
+            setting_index = 6;
             _mode = MODE_DISPLAY;
         }
         setting_index = setting_index == 4 ? setting_index - 2 : setting_index - 1;
@@ -94,11 +101,11 @@ void mode_SetTime(uint8_t keyState)
     LimitDateValue(MONTH, 12, 1);
     LimitDateValue(YEAR, 99, 0);
 
-    int dp[6] = {0, 1, 0, 1, 0, 1};
+    int dp[6] = {0, 2, 0, 2, 0, 2};
 
     if (setting_index > 3)
     {
-        int tt[3] = {10, 10, 10};
+        int tt[3] = {time[YEAR], time[MONTH], time[DAY]};
         SetNixieSchematicByTime(tt, dp);
         return;
     }
@@ -108,16 +115,15 @@ void mode_SetTime(uint8_t keyState)
 
 void mode_SerialSetTime(uint8_t keyState)
 {
-    Serial.println("SERIAL MODE ENTER COMMAND");
     char command = Serial.read();
     switch (command)
     {
     case 's':
         Serial.println("SETTING TIME ENTER 6BYTES TIME CODE");
-        uint8_t buffer[6];
+        uint8_t buffer[7];
         Serial.readBytes(buffer, sizeof(buffer));
-        for (int i = 0; i <= 5; i++)
-            time[i] = buffer[i];
+        for (int i = 0; i <= 6; i++)
+            time[6 - i] = buffer[i];
         break;
     case 'q':
         Serial.println("QUIT SERIAL MODE");
@@ -154,9 +160,9 @@ void SetNixieSchematicByTime(int *code, int *dpCode = 0, bool none = false)
 {
     for (int cnt = 0; cnt < 3; cnt++)
     {
-        nixie.schematic[2 * cnt][0] = none == false ? code[3 - cnt] / 10 : 10;
+        nixie.schematic[2 * cnt][0] = none == false ? code[cnt] / 10 : 10;
         nixie.schematic[2 * cnt][1] = dpCode[2 * cnt];
-        nixie.schematic[2 * cnt + 1][0] = none == false ? code[3 - cnt] % 10 : 10;
+        nixie.schematic[2 * cnt + 1][0] = none == false ? code[cnt] % 10 : 10;
         nixie.schematic[2 * cnt + 1][1] = dpCode[2 * cnt + 1];
     }
 }

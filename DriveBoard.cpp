@@ -2,21 +2,25 @@
 
 uint8_t DriveBoard::ReadKeyState()
 {
-    for (int cnt = 18; cnt <= 21; cnt++)
+    uint8_t c_keyState = 0;
+    for (int cnt = 14; cnt <= 17; cnt++)
     {
         int state = digitalRead(cnt);
-        if (bitRead(keyState, cnt - 18) != state)
+
+        if (bitRead(keyState, cnt - 14) != state)
         {
-            keyState = state << (cnt - 14);
+            c_keyState += state << (cnt - 10);
         }
-        keyState += digitalRead(cnt) << (cnt - 18);
+        c_keyState += state << (cnt - 14);
     }
-    return keyState;
+
+    keyState = c_keyState;
+    return c_keyState;
 }
 
 DriveBoard::DriveBoard()
 {
-    for (int cnt = 18; cnt <= 21; cnt++)
+    for (int cnt = 14; cnt <= 17; cnt++)
         pinMode(cnt, INPUT);
 }
 
