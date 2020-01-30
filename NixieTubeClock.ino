@@ -43,7 +43,7 @@ void loop()
     uint8_t keyState = boad.ReadKeyState();
     if (Serial.available() > 0)
     {
-        //_mode = MODE_SERIAL;
+        _mode = MODE_SERIAL;
     }
     if(_mode == MODE_DISPLAY) mode_Clock(keyState);
     if(_mode == MODE_SETTING) mode_SetTime(keyState);
